@@ -1258,6 +1258,12 @@ class MethodProxies {
         @Override
         public Object call(Object who, Method method, Object... args) throws Throwable {
             MethodParameterUtils.replaceFirstAppPkg(args);
+
+            if (Build.VERSION.SDK_INT >= 31) {
+
+                return method.invoke(who, args);
+            }
+
             args[mRequiredPermissionIndex] = null;
             IntentFilter filter = (IntentFilter) args[mIntentFilterIndex];
             SpecialComponentList.protectIntentFilter(filter);
