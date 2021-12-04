@@ -29,6 +29,7 @@
         <activity
             android:name=".splash.SplashActivity"
             android:screenOrientation="portrait"
+            android:exported="true"
             android:theme="@style/AppTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -87,6 +88,7 @@
             android:excludeFromRecents="true"
             android:label="@string/shared_to_vxp"
             android:screenOrientation="portrait"
+            android:exported="true"
             android:taskAffinity="${applicationId}.share"
             android:theme="@style/Theme.AppCompat.Light.Dialog">
             <intent-filter>
