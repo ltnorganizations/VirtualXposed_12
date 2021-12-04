@@ -19,6 +19,24 @@ import java.lang.reflect.Method;
 @SuppressWarnings("unused")
 class MethodProxies {
 
+
+    // getNotificationChannels
+
+    static class GetNotificationChannels extends MethodProxy {
+
+        @Override
+        public String getMethodName() {
+            return "getNotificationChannels";
+        }
+
+        @Override
+        public Object call(Object who, Method method, Object... args) throws Throwable {
+            args[0] = getHostPkg();
+            args[1] = getHostPkg();
+            return method.invoke(who, args);
+        }
+    }
+
     static class EnqueueNotification extends MethodProxy {
 
         @Override
