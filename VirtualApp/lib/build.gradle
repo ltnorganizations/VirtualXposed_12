@@ -39,11 +39,7 @@ android {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    api("me.weishu.exposed:exposed-core:0.8.1") {
-        exclude group: 'me.weishu', module: 'free_reflection'
-        exclude group: 'me.weishu', module: 'epic'
-        exclude group: 'me.weishu.exposed', module: 'exposed-xposedapi'
-    }
+
     implementation "com.github.tiann:epic:0.11.2"
     // epic is already contains exposed-xposedapi & FreeReflection
 }

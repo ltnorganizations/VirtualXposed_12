@@ -3,12 +3,8 @@ package io.virtualapp.delegate;
 import android.app.Application;
 
 import com.lody.virtual.client.core.VirtualCore;
-import com.lody.virtual.os.VEnvironment;
 
 import jonathanfinerty.once.Once;
-import me.weishu.exposed.LogcatService;
-
-import static io.virtualapp.XApp.XPOSED_INSTALLER_PACKAGE;
 
 /**
  * @author weishu
@@ -40,9 +36,6 @@ public class BaseVirtualInitializer extends VirtualCore.VirtualInitializer {
         virtualCore.setPhoneInfoDelegate(new MyPhoneInfoDelegate());
         //fake task description's icon and title
         virtualCore.setTaskDescriptionDelegate(new MyTaskDescDelegate());
-
-        // ensure the logcat service alive when every virtual process start.
-        LogcatService.start(application, VEnvironment.getDataUserPackageDirectory(0, XPOSED_INSTALLER_PACKAGE));
     }
 
     @Override
