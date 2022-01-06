@@ -22,4 +22,16 @@ public class DeviceUtil {
     public static boolean isSamsung() {
         return "samsung".equalsIgnoreCase(Build.BRAND) || "samsung".equalsIgnoreCase(Build.MANUFACTURER);
     }
+
+    public static boolean isX86_64() {
+        String[] abis = Build.SUPPORTED_ABIS;
+
+        for (String cpuAbi : abis) {
+            if (cpuAbi.equals("x86_64"))
+                return true;
+        }
+
+        return false;
+    }
+
 }
