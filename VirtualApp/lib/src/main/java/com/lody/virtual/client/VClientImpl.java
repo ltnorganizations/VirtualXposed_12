@@ -249,10 +249,6 @@ public final class VClientImpl extends IVClient.Stub {
         }
         mirror.android.os.Build.SERIAL.set(deviceInfo.serial);
         mirror.android.os.Build.DEVICE.set(Build.DEVICE.replace(" ", "_"));
-        ActivityThread.mInitialApplication.set(
-                VirtualCore.mainThread(),
-                null
-        );
         AppBindData data = new AppBindData();
         InstalledAppInfo info = VirtualCore.get().getInstalledAppInfo(packageName, 0);
         if (info == null) {
