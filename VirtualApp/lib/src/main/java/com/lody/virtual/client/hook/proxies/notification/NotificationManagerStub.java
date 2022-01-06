@@ -32,6 +32,7 @@ public class NotificationManagerStub extends MethodInvocationProxy<MethodInvocat
     @Override
     protected void onBindMethods() {
         super.onBindMethods();
+        addMethodProxy(new ReplaceCallingPkgMethodProxy("enqueueTextToast"));
         addMethodProxy(new ReplaceCallingPkgMethodProxy("enqueueToast"));
         addMethodProxy(new ReplaceCallingPkgMethodProxy("cancelToast"));
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
