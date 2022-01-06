@@ -1,6 +1,7 @@
 package com.lody.virtual.client.hook.proxies.appops;
 
 import android.annotation.TargetApi;
+import android.app.SyncNotedAppOp;
 import android.content.Context;
 import android.os.Build;
 
@@ -15,8 +16,6 @@ import mirror.com.android.internal.app.IAppOpsService;
 
 /**
  * @author Lody
- *         <p>
- *         Fuck the AppOpsService.
  * @see android.app.AppOpsManager
  */
 @TargetApi(Build.VERSION_CODES.KITKAT)
@@ -41,16 +40,21 @@ public class AppOpsManagerStub extends BinderInvocationProxy {
         addMethodProxy(new BaseMethodProxy("setAudioRestriction", 2, -1));
         addMethodProxy(new ReplaceLastPkgMethodProxy("resetAllModes"));
         addMethodProxy(new MethodProxy() {
-            @Override
-            public String getMethodName() {
-                return "noteProxyOperation";
-            }
+                @Override
+                public String getMethodName() {
+                    return "noteProxyOperation";
+                }
 
-            @Override
-            public Object call(Object who, Method method, Object... args) throws Throwable {
-                return 0;
-            }
-        });
+                @Override
+                public Object call(Object who, Method method, Object... args) throws Throwable {
+
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                        return method.invoke(who, args);
+                    }
+
+                    return 0;
+                }
+            });
     }
 
     private class BaseMethodProxy extends StaticMethodProxy {
