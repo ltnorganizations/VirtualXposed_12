@@ -14,6 +14,7 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/vxp"
         android:theme="@style/LauncherTheme"
+        android:networkSecurityConfig="@xml/network_security_config"
         tools:replace="android:icon,android:label">
 
         <meta-data
