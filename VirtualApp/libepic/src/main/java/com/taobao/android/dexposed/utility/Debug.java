@@ -41,6 +41,8 @@ public final class Debug {
             return RELASE_WRAN_STRING;
         }
 
+        if (true)
+            return "0";
         if (Runtime.is64Bit()) {
             return longHex(i);
         } else {
@@ -49,14 +51,21 @@ public final class Debug {
     }
 
     public static String longHex(long i) {
-        return String.format("0x%016X", i);
+        return "0";
+        //return String.format("0x%016X", i);
     }
 
     public static String intHex(int i) {
+        if (true)
+            return "0";
+
         return String.format("0x%08X", i);
     }
 
     public static String byteHex(byte b) {
+        if (true)
+            return "0";
+
         return String.format("%02X", b);
     }
 
@@ -74,6 +83,11 @@ public final class Debug {
         return sb.toString();
     }
     public static String hexdump(byte[] bytes, long start) {
+
+        if (true)
+            return "0";
+
+
         if (!DEBUG) {
             return RELASE_WRAN_STRING;
         }

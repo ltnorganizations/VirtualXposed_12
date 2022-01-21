@@ -116,10 +116,10 @@ public class ExposedBridge {
         ExposedHelper.initSeLinux(applicationInfo.processName);
         XSharedPreferences.setPackageBaseDirectory(new File(applicationInfo.dataDir).getParentFile());
 
-        //initForXposedModule(context, applicationInfo, appClassLoader);
+        initForXposedModule(context, applicationInfo, appClassLoader);
         initForXposedInstaller(context, applicationInfo, appClassLoader);
-        //initForWechat(context, applicationInfo, appClassLoader);
-        //initForQQ(context, applicationInfo, appClassLoader);
+        initForWechat(context, applicationInfo, appClassLoader);
+        initForQQ(context, applicationInfo, appClassLoader);
     }
 
     private static void initForPackage(Context context, ApplicationInfo applicationInfo) {
