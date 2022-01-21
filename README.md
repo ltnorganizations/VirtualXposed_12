@@ -82,7 +82,7 @@ For Developers
 --------------
 
 - [File a bug](https://github.com/android-hacker/exposed/issues)
-- [Wiki](https://github.com/android-hacker/VirtualXposed/wiki)
+- [Wiki](https://github.com/so-lli/VirtualXposed_12/wiki)
 - [Telegram](https://t.me/vxp_devs)
 
 Credits
@@ -91,3 +91,5 @@ Credits
 1. [VirtualApp](https://github.com/asLody/VirtualApp)
 2. [Xposed](https://github.com/rovo89/Xposed)
 3. [And64InlineHook](https://github.com/Rprop/And64InlineHook)
+4. [VirtualXposed](https://github.com/android-hacker/VirtualXposed)
+5. [epic](https://github.com/tiann/epic)
