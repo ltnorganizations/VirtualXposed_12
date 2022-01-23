@@ -55,7 +55,20 @@ public class AppOpsManagerStub extends BinderInvocationProxy {
                     return 0;
                 }
             });
-    }
+
+        switch (Build.VERSION.SDK_INT) {
+            case Build.VERSION_CODES.S:
+            case Build.VERSION_CODES.R:
+                addMethodProxy(new BaseMethodProxy("startWatchingAsyncNoted", -1,  0));
+                addMethodProxy(new BaseMethodProxy("stopWatchingAsyncNoted", -1,  0));
+                addMethodProxy(new BaseMethodProxy("extractAsyncOps", -1,  0));
+                addMethodProxy(new BaseMethodProxy("collectNoteOpCallsForValidation", -1,  2));
+                break;
+            case Build.VERSION_CODES.Q:
+            case Build.VERSION_CODES.P:
+                addMethodProxy(new BaseMethodProxy("startWatchingModeWithFlags", -1,  1));
+                break;
+        }    }
 
     private class BaseMethodProxy extends StaticMethodProxy {
         final int pkgIndex;
