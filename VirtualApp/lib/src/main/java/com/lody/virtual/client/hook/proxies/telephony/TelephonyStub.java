@@ -5,11 +5,13 @@ import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
+import android.util.Log;
 
 import com.lody.virtual.client.VClientImpl;
 import com.lody.virtual.client.core.VirtualCore;
 import com.lody.virtual.client.hook.base.BinderInvocationProxy;
 import com.lody.virtual.client.hook.base.Inject;
+import com.lody.virtual.client.hook.base.MethodProxy;
 import com.lody.virtual.client.hook.base.ReplaceCallingPkgMethodProxy;
 import com.lody.virtual.client.hook.base.ReplaceLastPkgMethodProxy;
 
@@ -49,7 +51,6 @@ public class TelephonyStub extends BinderInvocationProxy {
 		addMethodProxy(new ReplaceLastPkgMethodProxy("getCdmaEriTextForSubscriber"));
 		addMethodProxy(new ReplaceLastPkgMethodProxy("getNetworkTypeForSubscriber"));
 		addMethodProxy(new ReplaceCallingPkgMethodProxy("getDataNetworkType"));
-		addMethodProxy(new ReplaceLastPkgMethodProxy("getDataNetworkTypeForSubscriber"));
 		addMethodProxy(new ReplaceLastPkgMethodProxy("getVoiceNetworkTypeForSubscriber"));
 		addMethodProxy(new ReplaceCallingPkgMethodProxy("getLteOnCdmaMode"));
 		addMethodProxy(new ReplaceLastPkgMethodProxy("getLteOnCdmaModeForSubscriber"));
@@ -59,6 +60,22 @@ public class TelephonyStub extends BinderInvocationProxy {
 		addMethodProxy(new ReplaceCallingPkgMethodProxy("getMergedSubscriberIds"));
 		addMethodProxy(new ReplaceLastPkgMethodProxy("getRadioAccessFamily"));
 		addMethodProxy(new ReplaceCallingPkgMethodProxy("isVideoCallingEnabled"));
+
+		addMethodProxy(new MethodProxy() {
+
+			@Override
+			public boolean beforeCall(Object who, Method method, Object... args) {
+				args[1] = VirtualCore.get().getHostPkg();
+
+				return super.beforeCall(who, method, args);
+			}
+
+			@Override
+			public String getMethodName() {
+				return "getDataNetworkTypeForSubscriber";
+			}
+		});
+
 
 		addMethodProxy(new ReplaceCallingPkgMethodProxy("getDeviceIdWithFeature") {
 			@Override
