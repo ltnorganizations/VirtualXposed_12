@@ -39,6 +39,7 @@ import com.lody.virtual.client.hook.proxies.mount.MountServiceStub;
 import com.lody.virtual.client.hook.proxies.network.NetworkManagementStub;
 import com.lody.virtual.client.hook.proxies.notification.NotificationManagerStub;
 import com.lody.virtual.client.hook.proxies.os.DeviceIdentifiersPolicyServiceStub;
+import com.lody.virtual.client.hook.proxies.permission.PermissionManagerStub;
 import com.lody.virtual.client.hook.proxies.persistent_data_block.PersistentDataBlockServiceStub;
 import com.lody.virtual.client.hook.proxies.phonesubinfo.PhoneSubInfoStub;
 import com.lody.virtual.client.hook.proxies.pm.LauncherAppsStub;
@@ -69,6 +70,7 @@ import static android.os.Build.VERSION_CODES.LOLLIPOP;
 import static android.os.Build.VERSION_CODES.LOLLIPOP_MR1;
 import static android.os.Build.VERSION_CODES.M;
 import static android.os.Build.VERSION_CODES.N;
+import static android.os.Build.VERSION_CODES.R;
 
 /**
  * @author Lody
@@ -200,6 +202,9 @@ public final class InvocationStubManager {
 
             	// http://aospxref.com/android-10.0.0_r47/xref/frameworks/base/core/java/android/os/IDeviceIdentifiersPolicyService.aidl#24
             	addInjector(new DeviceIdentifiersPolicyServiceStub());
+			}
+			if (Build.VERSION.SDK_INT >= R) {
+				addInjector(new PermissionManagerStub());
 			}
 		}
 	}
