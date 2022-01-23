@@ -76,6 +76,20 @@ public class TelephonyStub extends BinderInvocationProxy {
 			}
 		});
 
+		addMethodProxy(new MethodProxy() {
+			@Override
+			public boolean beforeCall(Object who, Method method, Object... args) {
+				args[1] = VirtualCore.get().getHostPkg();
+
+				return super.beforeCall(who, method, args);
+			}
+
+			@Override
+			public String getMethodName() {
+				return "getVoiceNetworkTypeForSubscriber";
+			}
+		});
+
 
 		addMethodProxy(new ReplaceCallingPkgMethodProxy("getDeviceIdWithFeature") {
 			@Override
