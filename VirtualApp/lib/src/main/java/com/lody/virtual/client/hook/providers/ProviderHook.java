@@ -11,6 +11,7 @@ import android.os.ParcelFileDescriptor;
 
 import com.lody.virtual.client.core.VirtualCore;
 import com.lody.virtual.client.hook.base.MethodBox;
+import com.lody.virtual.client.stub.StorageRedirect;
 import com.lody.virtual.helper.compat.BuildCompat;
 import com.lody.virtual.helper.utils.VLog;
 
@@ -166,10 +167,10 @@ public class ProviderHook implements InvocationHandler {
         try {
             String name = method.getName();
             if ("call".equals(name)) {
-                if(Build.VERSION.SDK_INT >= 31)
+                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
                     fixAttributionSource(args[0]);
 
-                if (Build.VERSION.SDK_INT >= 31) {
+                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                     start = 2;
                 } else if (BuildCompat.isR()) {
                     start = 3;
@@ -181,12 +182,26 @@ public class ProviderHook implements InvocationHandler {
                 Bundle extras = (Bundle) args[start + 2];
                 return call(methodBox, methodName, arg, extras);
             } else if ("insert".equals(name)) {
-                if(Build.VERSION.SDK_INT >= 31)
+                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
                     fixAttributionSource(args[0]);
 
-                Uri url = (Uri) args[start];
-                ContentValues initialValues = (ContentValues) args[start + 1];
-                return insert(methodBox, url, initialValues);
+
+                // TODO: fixit
+                for (int i = 0; i < args.length; i++) {
+                    if (args[i] instanceof ContentValues) {
+                        ContentValues cv = (ContentValues) args[i];
+                        for (String key : cv.keySet()) {
+                            String file = cv.get(key).toString();
+                            if (file.contains("file:///")) {
+                                cv.remove(key);
+                                cv.put(key, StorageRedirect.redirect(file));
+                                args[i] = cv;
+                            }
+                        }
+                    }
+                }
+
+                return method.invoke(mBase, args);
             } else if ("getType".equals(name)) {
                 return getType(methodBox, (Uri) args[0]);
             } else if ("delete".equals(name)) {
@@ -251,7 +266,7 @@ public class ProviderHook implements InvocationHandler {
                     selectionArgs = (String[]) args[start + 3];
                     sortOrder = (String) args[start + 4];
                 }
-                return query(methodBox, url, projection, selection, selectionArgs, sortOrder, queryArgs);
+                return method.invoke(mBase, args);
             }
             return methodBox.call();
         } catch (Throwable e) {
