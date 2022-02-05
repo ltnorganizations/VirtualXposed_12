@@ -24,6 +24,20 @@ public class DevicePolicyManagerStub extends BinderInvocationProxy{
     protected void onBindMethods() {
         super.onBindMethods();
         addMethodProxy(new GetStorageEncryptionStatus());
+
+        addMethodProxy(new MethodProxy() {
+
+            @Override
+            public Object call(Object who, Method method, Object... args) throws Throwable {
+                return null;
+            }
+
+            @Override
+            public String getMethodName() {
+                return "getDeviceOwnerComponent";
+            }
+        });
+
     }
 
     private static class GetStorageEncryptionStatus extends MethodProxy {
