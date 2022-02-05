@@ -10,6 +10,8 @@ import android.content.pm.PermissionInfo;
 import android.content.pm.ProviderInfo;
 import android.content.pm.ResolveInfo;
 import android.content.pm.ServiceInfo;
+import android.content.pm.SharedLibraryInfo;
+import android.content.pm.VersionedPackage;
 import android.os.IBinder;
 import android.os.RemoteException;
 
@@ -20,7 +22,10 @@ import com.lody.virtual.server.IPackageInstaller;
 import com.lody.virtual.server.IPackageManager;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
+
+import mirror.android.content.pm.ApplicationInfoN;
 
 /**
  * @author Lody
@@ -194,7 +199,7 @@ public class VPackageManager {
             boolean forceAdd = sharedLibraries.contains("org.apache.http.legacy");
 
             // https://cs.android.com/android/platform/superproject/+/master:frameworks/base/services/core/java/com/android/server/pm/parsing/library/OrgApacheHttpLegacyUpdater.java;l=36?q=OrgApacheHttpLegacyUpdater&ss=android%2Fplatform%2Fsuperproject:frameworks%2Fbase%2Fservices%2Fcore%2Fjava%2Fcom%2Fandroid%2Fserver%2Fpm%2Fparsing%2Flibrary%2F
-            if (android.os.Build.VERSION.SDK_INT >= P && info.targetSdkVersion < P || forceAdd) {
+            if (android.os.Build.VERSION.SDK_INT >= P && forceAdd) {
                 String[] newSharedLibraryFiles;
                 if (info.sharedLibraryFiles == null) {
                     newSharedLibraryFiles = new String[]{APACHE_LEGACY};
@@ -204,8 +209,17 @@ public class VPackageManager {
                     System.arraycopy(info.sharedLibraryFiles, 0, newSharedLibraryFiles, 0, newLength - 1);
                     newSharedLibraryFiles[newLength - 1] = APACHE_LEGACY;
                 }
+
                 info.sharedLibraryFiles = newSharedLibraryFiles;
+
+                SharedLibraryInfo sharedLibraryInfos = (SharedLibraryInfo) mirror.android.content.pm.SharedLibraryInfo.constructor.newInstance("/system/framework/org.apache.http.legacy.jar", null, null, "org.apache.http.legacy", -1, 0, new VersionedPackage("android", 0), null, null, false);
+
+                List<SharedLibraryInfo> infos = new ArrayList<>();
+                infos.add(sharedLibraryInfos);
+
+                ApplicationInfoN.sharedLibraryInfos.set(info, infos);
             }
+
 
             String TEST_BASE = "/system/framework/android.test.base.jar";
             if (BuildCompat.isR() && new File(TEST_BASE).exists()) {
@@ -218,6 +232,14 @@ public class VPackageManager {
                     System.arraycopy(info.sharedLibraryFiles, 0, newSharedLibraryFiles, 0, newLength - 1);
                     newSharedLibraryFiles[newLength - 1] = TEST_BASE;
                 }
+
+                SharedLibraryInfo sharedLibraryInfos = (SharedLibraryInfo) mirror.android.content.pm.SharedLibraryInfo.constructor.newInstance("/system/framework/android.test.base.jar", null, null, "android.test.base", -1, 0, new VersionedPackage("android", 0), null, null, false);
+
+                List<SharedLibraryInfo> infos = new ArrayList<>();
+                infos.add(sharedLibraryInfos);
+
+                ApplicationInfoN.sharedLibraryInfos.set(info, infos);
+
                 info.sharedLibraryFiles = newSharedLibraryFiles;
             }
             return info;
