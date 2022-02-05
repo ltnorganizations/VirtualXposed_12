@@ -57,6 +57,7 @@ public class AppOpsManagerStub extends BinderInvocationProxy {
             });
 
         switch (Build.VERSION.SDK_INT) {
+            case 32:
             case Build.VERSION_CODES.S:
             case Build.VERSION_CODES.R:
                 addMethodProxy(new BaseMethodProxy("startWatchingAsyncNoted", -1,  0));
