@@ -1,8 +1,11 @@
 package com.lody.virtual.client.hook.proxies.telephony;
 
+import android.os.Build;
 import android.telephony.PhoneStateListener;
 
+import com.lody.virtual.client.core.VirtualCore;
 import com.lody.virtual.client.hook.base.BinderInvocationProxy;
+import com.lody.virtual.client.hook.base.MethodProxy;
 import com.lody.virtual.client.hook.base.ReplaceCallingPkgMethodProxy;
 import com.lody.virtual.client.hook.base.ReplaceSequencePkgMethodProxy;
 
@@ -39,5 +42,19 @@ public class TelephonyRegistryStub extends BinderInvocationProxy {
 				return super.beforeCall(who, method, args);
 			}
 		});
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+			addMethodProxy(new MethodProxy() {
+				@Override
+				public Object call(Object who, Method method, Object... args) throws Throwable {
+					args[1] = VirtualCore.get().getHostPkg();
+					return super.call(who, method, args);
+				}
+
+				@Override
+				public String getMethodName() {
+					return "listenWithEventList";
+				}
+			});
+		}
 	}
 }
