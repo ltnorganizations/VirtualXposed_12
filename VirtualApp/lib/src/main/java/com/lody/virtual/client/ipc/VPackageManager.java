@@ -198,8 +198,10 @@ public class VPackageManager {
             List<String> sharedLibraries = getInterface().getSharedLibraries(packageName);
             boolean forceAdd = sharedLibraries.contains("org.apache.http.legacy");
 
+            List<SharedLibraryInfo> infos = new ArrayList<>();
+
             // https://cs.android.com/android/platform/superproject/+/master:frameworks/base/services/core/java/com/android/server/pm/parsing/library/OrgApacheHttpLegacyUpdater.java;l=36?q=OrgApacheHttpLegacyUpdater&ss=android%2Fplatform%2Fsuperproject:frameworks%2Fbase%2Fservices%2Fcore%2Fjava%2Fcom%2Fandroid%2Fserver%2Fpm%2Fparsing%2Flibrary%2F
-            if (android.os.Build.VERSION.SDK_INT >= P && forceAdd) {
+            if (android.os.Build.VERSION.SDK_INT >= P) {
                 String[] newSharedLibraryFiles;
                 if (info.sharedLibraryFiles == null) {
                     newSharedLibraryFiles = new String[]{APACHE_LEGACY};
@@ -210,14 +212,10 @@ public class VPackageManager {
                     newSharedLibraryFiles[newLength - 1] = APACHE_LEGACY;
                 }
 
-                info.sharedLibraryFiles = newSharedLibraryFiles;
-
                 SharedLibraryInfo sharedLibraryInfos = (SharedLibraryInfo) mirror.android.content.pm.SharedLibraryInfo.constructor.newInstance("/system/framework/org.apache.http.legacy.jar", null, null, "org.apache.http.legacy", -1, 0, new VersionedPackage("android", 0), null, null, false);
-
-                List<SharedLibraryInfo> infos = new ArrayList<>();
                 infos.add(sharedLibraryInfos);
 
-                ApplicationInfoN.sharedLibraryInfos.set(info, infos);
+                info.sharedLibraryFiles = newSharedLibraryFiles;
             }
 
 
@@ -234,14 +232,13 @@ public class VPackageManager {
                 }
 
                 SharedLibraryInfo sharedLibraryInfos = (SharedLibraryInfo) mirror.android.content.pm.SharedLibraryInfo.constructor.newInstance("/system/framework/android.test.base.jar", null, null, "android.test.base", -1, 0, new VersionedPackage("android", 0), null, null, false);
-
-                List<SharedLibraryInfo> infos = new ArrayList<>();
                 infos.add(sharedLibraryInfos);
-
-                ApplicationInfoN.sharedLibraryInfos.set(info, infos);
 
                 info.sharedLibraryFiles = newSharedLibraryFiles;
             }
+
+            ApplicationInfoN.sharedLibraryInfos.set(info, infos);
+
             return info;
         } catch (RemoteException e) {
             return VirtualRuntime.crash(e);
