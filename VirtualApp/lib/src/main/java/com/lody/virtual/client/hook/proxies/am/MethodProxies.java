@@ -29,6 +29,7 @@ import android.os.IInterface;
 import android.os.RemoteException;
 import android.provider.MediaStore;
 import android.text.TextUtils;
+import android.util.Log;
 import android.util.TypedValue;
 
 import com.lody.virtual.client.NativeEngine;
@@ -701,6 +702,22 @@ class MethodProxies {
             return isAppProcess();
         }
     }
+    static class GetCurrentUserId extends MethodProxy {
+        @Override
+        public String getMethodName() {
+            return "getCurrentUserId";
+        }
+
+        @Override
+        public Object call(Object who, Method method, Object... args) throws Throwable {
+            return VirtualCore.get().myUserId();
+        }
+
+        @Override
+        public boolean isEnable() {
+            return isAppProcess();
+        }
+    }
 
     static class GrantUriPermissionFromOwner extends MethodProxy {
 
@@ -841,7 +858,14 @@ class MethodProxies {
         @Override
         public Object call(Object who, Method method, Object... args) throws Throwable {
 
-            return super.call(who, method, args);
+            Log.d("SafeZone", "startActivityIntentSender: " + VirtualCore.get().getProcessName());
+            Intent intent = new Intent();
+            intent.setClassName("com.google.android.gms", "com.google.android.gms.auth.uiflows.addaccount.AccountIntroActivity");
+        VActivityManager.get().startActivity(intent, VirtualCore.get().myUserId());
+            //Debug.waitForDebugger();
+
+            return 0;
+            //return super.call(who, method, args);
         }
     }
 
