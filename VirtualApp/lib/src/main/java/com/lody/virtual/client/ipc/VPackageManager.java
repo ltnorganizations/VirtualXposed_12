@@ -17,7 +17,6 @@ import android.os.RemoteException;
 
 import com.lody.virtual.client.core.VirtualCore;
 import com.lody.virtual.client.env.VirtualRuntime;
-import com.lody.virtual.helper.compat.BuildCompat;
 import com.lody.virtual.server.IPackageInstaller;
 import com.lody.virtual.server.IPackageManager;
 
@@ -184,60 +183,46 @@ public class VPackageManager {
         }
     }
 
+    private void addSharedLibraries(ApplicationInfo info, List<String> libraries) {
+        List<SharedLibraryInfo> sharedLibsInfo = new ArrayList<>();
+
+        for (String libName : libraries) {
+            String path = String.format("/system/framework/%s.jar", libName);
+            if (new File(path).exists()) {
+                SharedLibraryInfo sharedLibraryInfo = addSharedLibrary(info, libName, path);
+                sharedLibsInfo.add(sharedLibraryInfo);
+            }
+        }
+
+        ApplicationInfoN.sharedLibraryInfos.set(info, sharedLibsInfo);
+    }
+
+    private SharedLibraryInfo addSharedLibrary(ApplicationInfo info, String name, String path) {
+        if (info.sharedLibraryFiles == null) {
+            info.sharedLibraryFiles = new String[]{path};
+        } else {
+            int newLength = info.sharedLibraryFiles.length + 1;
+            String[] newSharedLibraryFiles = new String[newLength];
+            System.arraycopy(info.sharedLibraryFiles, 0, newSharedLibraryFiles, 0, newLength - 1);
+            newSharedLibraryFiles[newLength - 1] = path;
+        }
+
+        return libNameToSharedLibraryInfo(path, name);
+    }
+
+    public static SharedLibraryInfo libNameToSharedLibraryInfo(String path, String name) {
+        return (SharedLibraryInfo) mirror.android.content.pm.SharedLibraryInfo.constructor.newInstance(path, null, null, name, -1, 0, new VersionedPackage("android", 0), null, null, false);
+    }
+
     public ApplicationInfo getApplicationInfo(String packageName, int flags, int userId) {
         try {
             ApplicationInfo info = getInterface().getApplicationInfo(packageName, flags, userId);
             if (info == null) {
                 return null;
             }
-            final int P = 28;
-            String APACHE_LEGACY = "/system/framework/org.apache.http.legacy.boot.jar";
-            if (!new File(APACHE_LEGACY).exists()) {
-                APACHE_LEGACY = "/system/framework/org.apache.http.legacy.jar";
-            }
+
             List<String> sharedLibraries = getInterface().getSharedLibraries(packageName);
-            boolean forceAdd = sharedLibraries.contains("org.apache.http.legacy");
-
-            List<SharedLibraryInfo> infos = new ArrayList<>();
-
-            // https://cs.android.com/android/platform/superproject/+/master:frameworks/base/services/core/java/com/android/server/pm/parsing/library/OrgApacheHttpLegacyUpdater.java;l=36?q=OrgApacheHttpLegacyUpdater&ss=android%2Fplatform%2Fsuperproject:frameworks%2Fbase%2Fservices%2Fcore%2Fjava%2Fcom%2Fandroid%2Fserver%2Fpm%2Fparsing%2Flibrary%2F
-            if (android.os.Build.VERSION.SDK_INT >= P) {
-                String[] newSharedLibraryFiles;
-                if (info.sharedLibraryFiles == null) {
-                    newSharedLibraryFiles = new String[]{APACHE_LEGACY};
-                } else {
-                    int newLength = info.sharedLibraryFiles.length + 1;
-                    newSharedLibraryFiles = new String[newLength];
-                    System.arraycopy(info.sharedLibraryFiles, 0, newSharedLibraryFiles, 0, newLength - 1);
-                    newSharedLibraryFiles[newLength - 1] = APACHE_LEGACY;
-                }
-
-                SharedLibraryInfo sharedLibraryInfos = (SharedLibraryInfo) mirror.android.content.pm.SharedLibraryInfo.constructor.newInstance("/system/framework/org.apache.http.legacy.jar", null, null, "org.apache.http.legacy", -1, 0, new VersionedPackage("android", 0), null, null, false);
-                infos.add(sharedLibraryInfos);
-
-                info.sharedLibraryFiles = newSharedLibraryFiles;
-            }
-
-
-            String TEST_BASE = "/system/framework/android.test.base.jar";
-            if (BuildCompat.isR() && new File(TEST_BASE).exists()) {
-                String[] newSharedLibraryFiles;
-                if (info.sharedLibraryFiles == null) {
-                    newSharedLibraryFiles = new String[]{TEST_BASE};
-                } else {
-                    int newLength = info.sharedLibraryFiles.length + 1;
-                    newSharedLibraryFiles = new String[newLength];
-                    System.arraycopy(info.sharedLibraryFiles, 0, newSharedLibraryFiles, 0, newLength - 1);
-                    newSharedLibraryFiles[newLength - 1] = TEST_BASE;
-                }
-
-                SharedLibraryInfo sharedLibraryInfos = (SharedLibraryInfo) mirror.android.content.pm.SharedLibraryInfo.constructor.newInstance("/system/framework/android.test.base.jar", null, null, "android.test.base", -1, 0, new VersionedPackage("android", 0), null, null, false);
-                infos.add(sharedLibraryInfos);
-
-                info.sharedLibraryFiles = newSharedLibraryFiles;
-            }
-
-            ApplicationInfoN.sharedLibraryInfos.set(info, infos);
+            addSharedLibraries(info, sharedLibraries);
 
             return info;
         } catch (RemoteException e) {
