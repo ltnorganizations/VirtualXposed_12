@@ -58,6 +58,7 @@ public class ShortcutServiceStub extends BinderInvocationProxy {
 
         addMethodProxy(new ReplaceCallingPkgMethodProxy("getPinnedShortcuts"));
         addMethodProxy(new ReplacePkgAndShortcutMethodProxy("requestPinShortcut"));
+        addMethodProxy(new ReplacePkgAndShortcutMethodProxy("removeLongLivedShortcuts"));
     }
 
     @TargetApi(Build.VERSION_CODES.M)
