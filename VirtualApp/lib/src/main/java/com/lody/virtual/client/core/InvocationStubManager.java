@@ -1,5 +1,10 @@
 package com.lody.virtual.client.core;
 
+import static android.os.Build.VERSION_CODES.LOLLIPOP_MR1;
+import static android.os.Build.VERSION_CODES.M;
+import static android.os.Build.VERSION_CODES.N;
+import static android.os.Build.VERSION_CODES.R;
+
 import android.os.Build;
 
 import com.lody.virtual.client.hook.base.MethodInvocationProxy;
@@ -53,6 +58,7 @@ import com.lody.virtual.client.hook.proxies.telephony.TelephonyStub;
 import com.lody.virtual.client.hook.proxies.usage.UsageStatsManagerStub;
 import com.lody.virtual.client.hook.proxies.user.UserManagerStub;
 import com.lody.virtual.client.hook.proxies.vibrator.VibratorStub;
+import com.lody.virtual.client.hook.proxies.vibrator.VibratorStubForS;
 import com.lody.virtual.client.hook.proxies.view.AutoFillManagerStub;
 import com.lody.virtual.client.hook.proxies.wifi.WifiManagerStub;
 import com.lody.virtual.client.hook.proxies.wifi_scanner.WifiScannerStub;
@@ -62,15 +68,6 @@ import com.lody.virtual.helper.compat.BuildCompat;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import static android.os.Build.VERSION_CODES.JELLY_BEAN_MR1;
-import static android.os.Build.VERSION_CODES.JELLY_BEAN_MR2;
-import static android.os.Build.VERSION_CODES.KITKAT;
-import static android.os.Build.VERSION_CODES.LOLLIPOP;
-import static android.os.Build.VERSION_CODES.LOLLIPOP_MR1;
-import static android.os.Build.VERSION_CODES.M;
-import static android.os.Build.VERSION_CODES.N;
-import static android.os.Build.VERSION_CODES.R;
 
 /**
  * @author Lody
@@ -152,32 +149,26 @@ public final class InvocationStubManager {
 			addInjector(new ContentServiceStub());
 			addInjector(new ConnectivityStub());
 
-			if (Build.VERSION.SDK_INT >= JELLY_BEAN_MR2) {
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+				addInjector(new VibratorStubForS());
+			} else {
 				addInjector(new VibratorStub());
-				addInjector(new WifiManagerStub());
-				addInjector(new BluetoothStub());
-				addInjector(new ContextHubServiceStub());
 			}
-			if (Build.VERSION.SDK_INT >= JELLY_BEAN_MR1) {
-				addInjector(new UserManagerStub());
-			}
+			addInjector(new WifiManagerStub());
+			addInjector(new BluetoothStub());
+			addInjector(new ContextHubServiceStub());
+			addInjector(new UserManagerStub());
 
-			if (Build.VERSION.SDK_INT >= JELLY_BEAN_MR1) {
-				addInjector(new DisplayStub());
-			}
-			if (Build.VERSION.SDK_INT >= LOLLIPOP) {
-				addInjector(new PersistentDataBlockServiceStub());
-				addInjector(new InputMethodManagerStub());
-				addInjector(new MmsStub());
-				addInjector(new SessionManagerStub());
-				addInjector(new JobServiceStub());
-				addInjector(new RestrictionStub());
-			}
-			if (Build.VERSION.SDK_INT >= KITKAT) {
-				addInjector(new AlarmManagerStub());
-				addInjector(new AppOpsManagerStub());
-				addInjector(new MediaRouterServiceStub());
-			}
+			addInjector(new DisplayStub());
+			addInjector(new PersistentDataBlockServiceStub());
+			addInjector(new InputMethodManagerStub());
+			addInjector(new MmsStub());
+			addInjector(new SessionManagerStub());
+			addInjector(new JobServiceStub());
+			addInjector(new RestrictionStub());
+			addInjector(new AlarmManagerStub());
+			addInjector(new AppOpsManagerStub());
+			addInjector(new MediaRouterServiceStub());
 			if (Build.VERSION.SDK_INT >= LOLLIPOP_MR1) {
 				addInjector(new GraphicsStatsStub());
 				addInjector(new UsageStatsManagerStub());
