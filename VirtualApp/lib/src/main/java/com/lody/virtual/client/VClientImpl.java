@@ -1,5 +1,7 @@
 package com.lody.virtual.client;
 
+import static com.lody.virtual.os.VUserHandle.getUserId;
+
 import android.annotation.SuppressLint;
 import android.app.Application;
 import android.app.Instrumentation;
@@ -26,6 +28,7 @@ import android.os.RemoteException;
 import android.os.StrictMode;
 import android.system.ErrnoException;
 import android.system.Os;
+import android.util.ArrayMap;
 
 import com.lody.virtual.client.core.CrashHandler;
 import com.lody.virtual.client.core.InvocationStubManager;
@@ -71,15 +74,13 @@ import mirror.android.app.LoadedApk;
 import mirror.android.content.ContentProviderHolderOreo;
 import mirror.android.providers.Settings;
 import mirror.android.renderscript.RenderScriptCacheDir;
+import mirror.android.security.net.config.ApplicationConfig;
 import mirror.android.view.HardwareRenderer;
 import mirror.android.view.RenderScript;
 import mirror.android.view.ThreadedRenderer;
 import mirror.com.android.internal.content.ReferrerIntent;
 import mirror.dalvik.system.VMRuntime;
 import mirror.java.lang.ThreadGroupN;
-import mirror.android.security.net.config.ApplicationConfig;
-
-import static com.lody.virtual.os.VUserHandle.getUserId;
 
 /**
  * @author Lody
@@ -198,7 +199,10 @@ public final class VClientImpl extends IVClient.Stub {
                     Collections.singletonList(intent)
             );
         } else {
-            if (BuildCompat.isQ()) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S){
+                ArrayMap activities = ActivityThread.mActivities.get(ActivityThread.currentActivityThread.call(null));
+                ActivityThread.handleNewIntent.call(VirtualCore.mainThread(), activities.get(data.token), Collections.singletonList(intent));
+            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 ActivityThread.handleNewIntent.call(VirtualCore.mainThread(), data.token, Collections.singletonList(intent));
             } else {
                 ActivityThreadNMR1.performNewIntents.call(

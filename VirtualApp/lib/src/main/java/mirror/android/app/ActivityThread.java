@@ -1,8 +1,9 @@
 package mirror.android.app;
 
 
-import android.app.*;
 import android.app.Activity;
+import android.app.Application;
+import android.app.Instrumentation;
 import android.app.servertransaction.TransactionExecutor;
 import android.content.ComponentName;
 import android.content.Context;
@@ -15,20 +16,21 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.IInterface;
+import android.util.ArrayMap;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.Map;
 
-import mirror.RefClass;
-import mirror.RefConstructor;
-import mirror.RefObject;
-import mirror.RefMethod;
 import mirror.MethodParams;
 import mirror.MethodReflectParams;
-import mirror.RefStaticObject;
+import mirror.RefClass;
+import mirror.RefConstructor;
+import mirror.RefMethod;
+import mirror.RefObject;
 import mirror.RefStaticInt;
 import mirror.RefStaticMethod;
+import mirror.RefStaticObject;
 
 public class ActivityThread {
     public static Class<?> TYPE = RefClass.load(ActivityThread.class, "android.app.ActivityThread");
@@ -49,6 +51,7 @@ public class ActivityThread {
     @MethodParams({IBinder.class, String.class, int.class, int.class, Intent.class})
     public static RefMethod<Void> sendActivityResult;
     public static RefMethod<Binder> getApplicationThread;
+    public static RefObject<ArrayMap> mActivities;
 
     // Android 9.0
     public static RefObject<TransactionExecutor> mTransactionExecutor;
