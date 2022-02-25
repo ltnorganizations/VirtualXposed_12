@@ -211,7 +211,7 @@ public class VPackageManager {
     }
 
     public static SharedLibraryInfo libNameToSharedLibraryInfo(String path, String name) {
-        return (SharedLibraryInfo) mirror.android.content.pm.SharedLibraryInfo.constructor.newInstance(path, null, null, name, -1, 0, new VersionedPackage("android", 0), null, null, false);
+        return mirror.android.content.pm.SharedLibraryInfo.createSharedLibInfo(path, null, null, name, -1, 0, new VersionedPackage("android", 0), null, null, false);
     }
 
     public ApplicationInfo getApplicationInfo(String packageName, int flags, int userId) {
