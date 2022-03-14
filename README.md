@@ -59,12 +59,6 @@ Almost all modules except system-relevant are supported, please try it by yourse
 Others
 -------
 
-### GameGuardian
-
-VirtualXposed also supports GameGuardian, **you should use the separate version for GameGuardian**.(Download it in release page).
-
-[Video Tutorial](https://gameguardian.net/forum/gallery/image/437-no-root-via-virtualxposed-without-error-105-gameguardian/)
-
 ### VirusTotal
 
 VirusTotal might report VirtualXposed as a malware, it is stupid, you can refer to my [explanation](https://github.com/android-hacker/VirtualXposed/issues/10).
@@ -81,9 +75,8 @@ Contributions to VirtualXposed are always welcomed!!
 For Developers
 --------------
 
-- [File a bug](https://github.com/android-hacker/exposed/issues)
+- [File a bug](https://github.com/so-lli/exposed/issues)
 - [Wiki](https://github.com/so-lli/VirtualXposed_12/wiki)
-- [Telegram](https://t.me/vxp_devs)
 
 Credits
 -------
