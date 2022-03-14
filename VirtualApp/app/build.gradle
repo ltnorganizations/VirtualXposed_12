@@ -5,26 +5,17 @@ def localProp = file(project.rootProject.file('local.properties'))
 if (localProp.exists()) {
     properties.load(localProp.newDataInputStream())
 }
-def keyFile = file(properties.getProperty("keystore.path") ?: "/tmp/does_not_exist")
 
 android {
-    signingConfigs {
-        config {
-            keyAlias properties.getProperty("keystore.alias")
-            keyPassword properties.getProperty("keystore.pwd")
-            storeFile keyFile
-            storePassword properties.getProperty("keystore.alias_pwd")
-        }
-    }
 
-    compileSdkVersion 28
-    buildToolsVersion '28.0.3'
+    compileSdkVersion 31
+    buildToolsVersion '31.0.0'
     defaultConfig {
         applicationId "io.va.exposed64"
         minSdkVersion 21
-        targetSdkVersion 23
-        versionCode 203
-        versionName "0.20.3"
+        targetSdkVersion 31
+        versionCode 206
+        versionName "0.21.2"
         multiDexEnabled false
         android {
             defaultConfig {
@@ -39,10 +30,6 @@ android {
     productFlavors {
         aosp {
             dimension 'main'
-            //matchingFallbacks ['aosp']
-            if (keyFile.exists()) {
-                signingConfig signingConfigs.config
-            }
         }
 
         fdroid {

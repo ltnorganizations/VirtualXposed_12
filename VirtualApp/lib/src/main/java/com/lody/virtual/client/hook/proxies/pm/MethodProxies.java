@@ -16,6 +16,7 @@ import android.content.pm.PermissionGroupInfo;
 import android.content.pm.ProviderInfo;
 import android.content.pm.ResolveInfo;
 import android.content.pm.ServiceInfo;
+import android.content.pm.SharedLibraryInfo;
 import android.content.pm.Signature;
 import android.graphics.Bitmap;
 import android.os.Binder;
@@ -91,6 +92,40 @@ class MethodProxies {
         @Override
         public boolean isEnable() {
             return isAppProcess();
+        }
+    }
+
+    static class GetSharedLibraries extends MethodProxy {
+
+        @Override
+        public String getMethodName() {
+            return "getSharedLibraries";
+        }
+
+        @Override
+        public Object call(Object who, Method method, Object... args) throws Throwable {
+            String packageName = (String) args[0];
+
+            List<String> sharedLibs = VPackageManager.get().getInterface().getSharedLibraries(packageName);
+            List<SharedLibraryInfo> res = new ArrayList<>();
+
+            for (String libName : sharedLibs) {
+                String path = String.format("/system/framework/%s.jar", libName);
+                res.add(VPackageManager.libNameToSharedLibraryInfo(path, libName));
+            }
+
+            return ParceledListSliceCompat.create(res);
+        }
+
+        @Override
+        public boolean isEnable() {
+            return isAppProcess();
+        }
+    }
+    static class GetDeclaredSharedLibraries extends GetSharedLibraries {
+        @Override
+        public String getMethodName() {
+            return "getDeclaredSharedLibraries";
         }
     }
 
@@ -723,13 +758,9 @@ class MethodProxies {
         public Object call(Object who, Method method, Object... args) throws Throwable {
             String permName = (String) args[0];
             String pkgName = (String) args[1];
+
             int userId = VUserHandle.myUserId();
             return VPackageManager.get().checkPermission(permName, pkgName, userId);
-        }
-
-        @Override
-        public Object afterCall(Object who, Method method, Object[] args, Object result) throws Throwable {
-            return super.afterCall(who, method, args, result);
         }
 
         @Override

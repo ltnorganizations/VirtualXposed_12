@@ -1,12 +1,12 @@
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 28
-    buildToolsVersion '28.0.3'
+    compileSdkVersion 31
+    buildToolsVersion '31.0.0'
 
     defaultConfig {
         minSdkVersion 21
-        targetSdkVersion 22
+        targetSdkVersion 31
         versionCode 1
         versionName "1.0"
         externalNativeBuild {
@@ -39,14 +39,9 @@ android {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    api("me.weishu.exposed:exposed-core:0.8.1") {
-        exclude group: 'me.weishu', module: 'free_reflection'
-        exclude group: 'me.weishu', module: 'epic'
-        exclude group: 'me.weishu.exposed', module: 'exposed-xposedapi'
-    }
-    implementation "me.weishu:free_reflection:3.0.1"
-    implementation "me.weishu:epic:0.11.1"
-    implementation "me.weishu.exposed:exposed-xposedapi:0.4.6"
+    implementation project(path: ':exposed-core')
+    implementation "com.github.tiann:FreeReflection:3.1.0"
+    // epic is already contains exposed-xposedapi & FreeReflection
 }
 
 repositories {

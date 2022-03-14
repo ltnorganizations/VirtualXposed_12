@@ -76,10 +76,13 @@ public class NewHomeActivity extends NexusLauncherActivity {
     public void onCreate(Bundle savedInstanceState) {
         SharedPreferences sharedPreferences = getSharedPreferences(LauncherFiles.SHARED_PREFERENCES_KEY, Context.MODE_PRIVATE);
         super.onCreate(savedInstanceState);
-        showMenuKey();
         mUiHandler = new Handler(getMainLooper());
-        alertForMeizu();
-        alertForDonate();
+
+        if (Once.beenDone(Once.THIS_APP_VERSION, TAG)) {
+            alertForDoze();
+            return;
+        }
+
         mDirectlyBack = sharedPreferences.getBoolean(SettingsActivity.DIRECTLY_BACK_KEY, false);
     }
 
@@ -237,48 +240,6 @@ public class NewHomeActivity extends NexusLauncherActivity {
         }
     }
 
-    private void alertForDonate() {
-        final String TAG = "show_donate";
-        if (Once.beenDone(Once.THIS_APP_VERSION, TAG)) {
-            alertForDoze();
-            return;
-        }
-        AlertDialog alertDialog = new AlertDialog.Builder(getContext())
-                .setTitle(R.string.about_donate)
-                .setMessage(R.string.donate_dialog_content)
-                .setPositiveButton(android.R.string.yes, (dialog, which) -> {
-                    Misc.showDonate(this);
-                    Once.markDone(TAG);
-                })
-                .create();
-        try {
-            alertDialog.show();
-        } catch (Throwable ignored) {
-        }
-    }
-
-    private void alertForMeizu() {
-        if (!DeviceUtil.isMeizuBelowN()) {
-            return;
-        }
-        boolean isXposedInstalled = VirtualCore.get().isAppInstalled(XPOSED_INSTALLER_PACKAGE);
-        if (isXposedInstalled) {
-            return;
-        }
-        mUiHandler.postDelayed(() -> {
-            AlertDialog alertDialog = new AlertDialog.Builder(getContext())
-                    .setTitle(R.string.meizu_device_tips_title)
-                    .setMessage(R.string.meizu_device_tips_content)
-                    .setPositiveButton(android.R.string.yes, (dialog, which) -> {
-                    })
-                    .create();
-            try {
-                alertDialog.show();
-            } catch (Throwable ignored) {
-            }
-        }, 2000);
-    }
-
     private void alertForDoze() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
             return;
@@ -350,17 +311,6 @@ public class NewHomeActivity extends NexusLauncherActivity {
             } else {
                 setOurWallpaper(d);
             }
-        }
-    }
-
-    private void showMenuKey() {
-        try {
-            Method setNeedsMenuKey = Window.class.getDeclaredMethod("setNeedsMenuKey", int.class);
-            setNeedsMenuKey.setAccessible(true);
-            int value = WindowManager.LayoutParams.class.getField("NEEDS_MENU_SET_TRUE").getInt(null);
-            setNeedsMenuKey.invoke(getWindow(), value);
-        } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 }

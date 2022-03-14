@@ -9,7 +9,9 @@ import android.os.Bundle;
 import android.os.IInterface;
 import android.os.ParcelFileDescriptor;
 
+import com.lody.virtual.client.core.VirtualCore;
 import com.lody.virtual.client.hook.base.MethodBox;
+import com.lody.virtual.client.stub.StorageRedirect;
 import com.lody.virtual.helper.compat.BuildCompat;
 import com.lody.virtual.helper.utils.VLog;
 
@@ -21,6 +23,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import mirror.android.content.AttributionSource;
+import mirror.android.content.AttributionSourceState;
 import mirror.android.content.IContentProvider;
 
 /**
@@ -144,6 +148,11 @@ public class ProviderHook implements InvocationHandler {
         return (AssetFileDescriptor) methodBox.call();
     }
 
+    public void fixAttributionSource(Object attributionSource) {
+        AttributionSourceState.packageName.set(AttributionSource.mAttributionSourceState.get(attributionSource), VirtualCore.get().getContext().getPackageName());
+        AttributionSourceState.uid.set(AttributionSource.mAttributionSourceState.get(attributionSource), VirtualCore.get().myUid());
+    }
+
     @Override
     public Object invoke(Object proxy, Method method, Object... args) throws Throwable {
         try {
@@ -158,7 +167,12 @@ public class ProviderHook implements InvocationHandler {
         try {
             String name = method.getName();
             if ("call".equals(name)) {
-                if (BuildCompat.isR()) {
+                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
+                    fixAttributionSource(args[0]);
+
+                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    start = 2;
+                } else if (BuildCompat.isR()) {
                     start = 3;
                 } else if (BuildCompat.isQ()) {
                     start = 2;
@@ -168,35 +182,72 @@ public class ProviderHook implements InvocationHandler {
                 Bundle extras = (Bundle) args[start + 2];
                 return call(methodBox, methodName, arg, extras);
             } else if ("insert".equals(name)) {
-                Uri url = (Uri) args[start];
-                ContentValues initialValues = (ContentValues) args[start + 1];
-                return insert(methodBox, url, initialValues);
+                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
+                    fixAttributionSource(args[0]);
+
+
+                // TODO: fixit
+                for (int i = 0; i < args.length; i++) {
+                    if (args[i] instanceof ContentValues) {
+                        ContentValues cv = (ContentValues) args[i];
+                        for (String key : cv.keySet()) {
+                            String file = cv.get(key).toString();
+                            if (file.contains("file:///")) {
+                                cv.remove(key);
+                                cv.put(key, StorageRedirect.redirect(file));
+                                args[i] = cv;
+                            }
+                        }
+                    }
+                }
+
+                return method.invoke(mBase, args);
             } else if ("getType".equals(name)) {
                 return getType(methodBox, (Uri) args[0]);
             } else if ("delete".equals(name)) {
+                if(Build.VERSION.SDK_INT >= 31)
+                    fixAttributionSource(args[0]);
+
                 Uri url = (Uri) args[start];
                 String selection = (String) args[start + 1];
                 String[] selectionArgs = (String[]) args[start + 2];
                 return delete(methodBox, url, selection, selectionArgs);
             } else if ("bulkInsert".equals(name)) {
+                if(Build.VERSION.SDK_INT >= 31)
+                    fixAttributionSource(args[0]);
+
                 Uri url = (Uri) args[start];
                 ContentValues[] initialValues = (ContentValues[]) args[start + 1];
                 return bulkInsert(methodBox, url, initialValues);
             } else if ("update".equals(name)) {
+                if(Build.VERSION.SDK_INT >= 31)
+                    fixAttributionSource(args[0]);
+
                 Uri url = (Uri) args[start];
                 ContentValues values = (ContentValues) args[start + 1];
                 String selection = (String) args[start + 2];
                 String[] selectionArgs = (String[]) args[start + 3];
                 return update(methodBox, url, values, selection, selectionArgs);
             } else if ("openFile".equals(name)) {
+                if(Build.VERSION.SDK_INT >= 31)
+                    fixAttributionSource(args[0]);
+
                 Uri url = (Uri) args[start];
                 String mode = (String) args[start + 1];
                 return openFile(methodBox, url, mode);
             } else if ("openAssetFile".equals(name)) {
+                if(Build.VERSION.SDK_INT >= 31)
+                    fixAttributionSource(args[0]);
+
                 Uri url = (Uri) args[start];
                 String mode = (String) args[start + 1];
                 return openAssetFile(methodBox, url, mode);
             } else if ("query".equals(name)) {
+                if(Build.VERSION.SDK_INT >= 31) {
+                    fixAttributionSource(args[0]);
+                    start--;
+                }
+
                 Uri url = (Uri) args[start];
                 String[] projection = (String[]) args[start + 1];
                 String selection = null;
@@ -215,7 +266,7 @@ public class ProviderHook implements InvocationHandler {
                     selectionArgs = (String[]) args[start + 3];
                     sortOrder = (String) args[start + 4];
                 }
-                return query(methodBox, url, projection, selection, selectionArgs, sortOrder, queryArgs);
+                return method.invoke(mBase, args);
             }
             return methodBox.call();
         } catch (Throwable e) {

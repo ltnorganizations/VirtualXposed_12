@@ -44,6 +44,7 @@ import com.lody.virtual.client.ipc.VirtualStorageManager;
 import com.lody.virtual.client.stub.VASettings;
 import com.lody.virtual.helper.compat.BuildCompat;
 import com.lody.virtual.helper.compat.StorageManagerCompat;
+import com.lody.virtual.helper.utils.DeviceUtil;
 import com.lody.virtual.helper.utils.VLog;
 import com.lody.virtual.os.VEnvironment;
 import com.lody.virtual.os.VUserHandle;
@@ -248,10 +249,6 @@ public final class VClientImpl extends IVClient.Stub {
         }
         mirror.android.os.Build.SERIAL.set(deviceInfo.serial);
         mirror.android.os.Build.DEVICE.set(Build.DEVICE.replace(" ", "_"));
-        ActivityThread.mInitialApplication.set(
-                VirtualCore.mainThread(),
-                null
-        );
         AppBindData data = new AppBindData();
         InstalledAppInfo info = VirtualCore.get().getInstalledAppInfo(packageName, 0);
         if (info == null) {
@@ -330,20 +327,23 @@ public final class VClientImpl extends IVClient.Stub {
             applicationInfo.splitNames = new String[1];
         }
 
-
-        boolean enableXposed = VirtualCore.get().isXposedEnabled();
-        if (enableXposed) {
-            VLog.i(TAG, "Xposed is enabled.");
-            ClassLoader originClassLoader = context.getClassLoader();
-            ExposedBridge.initOnce(context, data.appInfo, originClassLoader);
-            List<InstalledAppInfo> modules = VirtualCore.get().getInstalledApps(0);
-            for (InstalledAppInfo module : modules) {
-                ExposedBridge.loadModule(module.apkPath, module.getOdexFile().getParent(), module.libPath,
-                        data.appInfo, originClassLoader);
+        if (!DeviceUtil.isX86_64()) {
+            boolean enableXposed = VirtualCore.get().isXposedEnabled();
+            if (enableXposed) {
+                VLog.i(TAG, "Xposed is enabled.");
+                ClassLoader originClassLoader = context.getClassLoader();
+                ExposedBridge.initOnce(context, data.appInfo, originClassLoader);
+                List<InstalledAppInfo> modules = VirtualCore.get().getInstalledApps(0);
+                for (InstalledAppInfo module : modules) {
+                    ExposedBridge.loadModule(module.apkPath, module.getOdexFile().getParent(), module.libPath,
+                            data.appInfo, originClassLoader);
+                }
+            } else {
+                VLog.w(TAG, "Xposed is disable..");
             }
-        } else {
-            VLog.w(TAG, "Xposed is disable..");
-        }
+        } else
+            VLog.e(TAG, "Xposed doesn't supports on x86_64");
+
         if (Build.VERSION.SDK_INT >= 30)
             ApplicationConfig.setDefaultInstance.call(new Object[] { null });
         mInitialApplication = LoadedApk.makeApplication.call(data.info, false, null);
