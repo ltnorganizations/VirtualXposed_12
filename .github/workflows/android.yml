@@ -9,6 +9,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v1
+    - name: git command
+      run: git config --global --add safe.directory /github/workspace
     - name: Checkout submodules
       uses: srt32/git-actions@v0.0.3
       with:
